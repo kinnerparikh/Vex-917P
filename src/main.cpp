@@ -10,8 +10,17 @@
 
 using namespace vex;
 
+
+vex::rotationUnits rotations = vex::rotationUnits::rev;
 // A global instance of vex::brain used for printing to the V5 brain screen
 vex::brain       Brain;
+// Motor Declarations
+vex::motor RightBack   (vex::PORT1, vex::gearSetting::ratio18_1, false);
+vex::motor RightFront  (vex::PORT2, vex::gearSetting::ratio18_1, false);
+vex::motor LeftBack    (vex::PORT3, vex::gearSetting::ratio18_1, false);
+vex::motor LeftFront   (vex::PORT4, vex::gearSetting::ratio18_1, false);
+
+
 // A global instance of vex::competition
 vex::competition Competition;
 
@@ -69,7 +78,13 @@ void usercontrol( void ) {
     // values based on feedback from the joysticks.
 
     Brain.Screen.print("Hello World");
-    Brain.Screen.print("This is actually working what the fuck.");
+    int howMany = 1;
+    RightBack.rotateFor(howMany, rotations);
+    
+    vex::task::sleep(1000);
+    
+    howMany = -2;
+    RightBack.rotateFor(howMany, rotations);
 
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to 
