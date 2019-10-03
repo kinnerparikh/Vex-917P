@@ -17,8 +17,8 @@ vex::brain       Brain;
 // Motor Declarations
 vex::motor RightBack   (vex::PORT1, vex::gearSetting::ratio18_1, false);
 vex::motor RightFront  (vex::PORT2, vex::gearSetting::ratio18_1, false);
-vex::motor LeftBack    (vex::PORT3, vex::gearSetting::ratio18_1, false);
-vex::motor LeftFront   (vex::PORT4, vex::gearSetting::ratio18_1, false);
+vex::motor LeftBack    (vex::PORT3, vex::gearSetting::ratio18_1, true);
+vex::motor LeftFront   (vex::PORT4, vex::gearSetting::ratio18_1, true);
 
 
 // A global instance of vex::competition
@@ -71,20 +71,14 @@ void autonomous( void ) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol( void ) {
+  
+  Controller1.rumble("*----*---*--*-**");
   // User control code here, inside the loop
   while (true) {
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo 
     // values based on feedback from the joysticks.
 
-    Brain.Screen.print("Hello World");
-    int howMany = 1;
-    RightBack.rotateFor(howMany, rotations);
-    
-    vex::task::sleep(1000);
-    
-    howMany = -2;
-    RightBack.rotateFor(howMany, rotations);
 
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to 
