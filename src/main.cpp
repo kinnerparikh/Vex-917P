@@ -14,11 +14,15 @@ using namespace vex;
 vex::rotationUnits rotations = vex::rotationUnits::rev;
 // A global instance of vex::brain used for printing to the V5 brain screen
 vex::brain       Brain;
+
 // Motor Declarations
-vex::motor RightBack   (vex::PORT1, vex::gearSetting::ratio18_1, false);
-vex::motor RightFront  (vex::PORT2, vex::gearSetting::ratio18_1, false);
-vex::motor LeftBack    (vex::PORT3, vex::gearSetting::ratio18_1, true);
-vex::motor LeftFront   (vex::PORT4, vex::gearSetting::ratio18_1, true);
+vex::motor RightBackMotor   (vex::PORT1, vex::gearSetting::ratio18_1, false);
+vex::motor RightFrontMotor  (vex::PORT2, vex::gearSetting::ratio18_1, false);
+vex::motor LeftBackMotor    (vex::PORT3, vex::gearSetting::ratio18_1, true);
+vex::motor LeftFrontMotor   (vex::PORT4, vex::gearSetting::ratio18_1, true);
+
+// Controller declaration
+vex::controller Controller1 = vex::controller();
 
 
 // A global instance of vex::competition
@@ -72,19 +76,22 @@ void autonomous( void ) {
 
 void usercontrol( void ) {
   
-  Controller1.rumble("*----*---*--*-**");
   // User control code here, inside the loop
   while (true) {
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo 
     // values based on feedback from the joysticks.
-
-
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to 
     // update your motors, etc.
     // ........................................................................
- 
+
+    // Motor control
+    LeftFrontMotor.spin(directionType::fwd, (Controller1.Axis3.value() + Controller1.Axis4.value())/2, velocityUnits::pct);
+    LeftBackMotor.spin(directionType::fwd, (Controller1.Axis3.value() + Controller1.Axis4.value())/2, velocityUnits::pct);
+    RightFrontMotor.spin(directionType::fwd, (Controller1.Axis1.value() + Controller1.Axis2.value())/2, velocityUnits::pct);
+    RightBackMotor.spin(directionType::fwd, (Controller1.Axis1.value() + Controller1.Axis2.value())/2, velocityUnits::pct);
+
     vex::task::sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
   }
 }
