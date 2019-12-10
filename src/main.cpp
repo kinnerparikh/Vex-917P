@@ -181,8 +181,24 @@ void usercontrol(void) {
       CubeTrayMotor.spin(directionType::fwd, -20, velocityUnits::pct);
     }
 
-    // Hello There dhan
-    // obama is bae
+    /*
+               _    _  _______  ____    _____ 
+         /\   | |  | ||__   __|/ __ \  / ____|
+        /  \  | |  | |   | |  | |  | || (___  
+       / /\ \ | |  | |   | |  | |  | | \___ \ 
+      / ____ \| |__| |   | |  | |__| | ____) |
+     /_/    \_\\____/    |_|   \____/ |_____/
+     -----------------------------------------
+    */
+    if (Controller1.ButtonA.pressing())
+    {
+      
+    }
+    else if (Controller1.ButtonB.pressing())
+    {
+
+    }
+    
 
     speedDR4B = 0;
     leftDrive = 0;
@@ -193,6 +209,8 @@ void usercontrol(void) {
     vex::task::sleep(20);
   }
 }
+
+
 
 //
 // Main will set up the competition functions and callbacks.
