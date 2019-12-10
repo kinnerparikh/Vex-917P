@@ -14,15 +14,15 @@ using namespace std;
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// LeftDriveMotor       motor         1               
-// RightDriveMotor      motor         10              
 // Controller1          controller                    
-// CenterDriveMotor     motor         5               
-// LeftDR4BMotor        motor         7               
-// RightDR4BMotor       motor         8               
-// LeftIntakeMotor      motor         2               
-// RightIntakeMotor     motor         6               
+// LeftDR4BMotor        motor         1               
+// LeftDriveMotor       motor         2               
+// LeftIntakeMotor      motor         3               
 // CubeTrayMotor        motor         4               
+// RightIntakeMotor     motor         5               
+// CenterDriveMotor     motor         6               
+// RightDriveMotor      motor         10              
+// RightDR4BMotor       motor         21              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 rotationUnits rotations = rotationUnits::rev;
 
@@ -198,8 +198,15 @@ void usercontrol(void) {
     {
 
     }
-    
 
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.print("Intake Speed: ");
+    Controller1.Screen.print(speedIntake);
+    Controller1.Screen.newLine();
+    Controller1.Screen.print("DR4B Position: L-");
+    Controller1.Screen.print(LeftDR4BMotor.position(degrees));
+    Controller1.Screen.print(" R-");
+    Controller1.Screen.print(RightDR4BMotor.position(degrees));
     speedDR4B = 0;
     leftDrive = 0;
     rightDrive = 0;
