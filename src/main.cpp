@@ -1,35 +1,33 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       kinnerparikh                                              */
-/*    Created:      Tue Sep 17 2019                                           */
-/*    Description:  V5 project                                                */
+/*    Author:       VEX                                                       */
+/*    Created:      Thu Sep 26 2019                                           */
+/*    Description:  Hello There                                               */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+
 #include "vex.h"
 
 using namespace vex;
+using namespace std;
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// LeftDriveMotor       motor         1               
+// RightDriveMotor      motor         10              
+// Controller1          controller                    
+// CenterDriveMotor     motor         5               
+// LeftDR4BMotor        motor         7               
+// RightDR4BMotor       motor         8               
+// LeftIntakeMotor      motor         2               
+// RightIntakeMotor     motor         6               
+// CubeTrayMotor        motor         4               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+rotationUnits rotations = rotationUnits::rev;
 
-
-vex::rotationUnits rotations = vex::rotationUnits::rev;
-// A global instance of vex::brain used for printing to the V5 brain screen
-vex::brain       Brain;
-
-// Motor Declarations
-vex::motor RightBackMotor   (vex::PORT1, vex::gearSetting::ratio18_1, false);
-vex::motor RightFrontMotor  (vex::PORT2, vex::gearSetting::ratio18_1, false);
-vex::motor LeftBackMotor    (vex::PORT3, vex::gearSetting::ratio18_1, true);
-vex::motor LeftFrontMotor   (vex::PORT4, vex::gearSetting::ratio18_1, true);
-
-// Controller declaration
-vex::controller Controller1 = vex::controller();
-
-
-// A global instance of vex::competition
-vex::competition Competition;
-
+competition Competition;
 // define your global instances of motors and other devices here
-
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -37,14 +35,16 @@ vex::competition Competition;
 /*  You may want to perform some actions before the competition starts.      */
 /*  Do them in the following function.  You must return from this function   */
 /*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the cortex has been powered on and    */ 
+/*  function is only called once after the V5 has been powered on and        */
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-void pre_auton( void ) {
+void pre_auton(void) {
+  // Initializing Robot Configuration. DO NOT REMOVE!
+  vexcodeInit();
+
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
-  
 }
 
 /*---------------------------------------------------------------------------*/
@@ -57,11 +57,11 @@ void pre_auton( void ) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void autonomous( void ) {
+void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-
+  
 }
 
 /*---------------------------------------------------------------------------*/
@@ -74,25 +74,122 @@ void autonomous( void ) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void usercontrol( void ) {
-  
+void usercontrol(void) {
   // User control code here, inside the loop
-  while (true) {
+  int leftDrive;
+  int rightDrive;
+  int speedDR4B = 0;
+  int speedIntake = 20;
+  while (1) {
     // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo 
+    // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
+
     // ........................................................................
-    // Insert user code here. This is where you use the joystick values to 
+    // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
     // ........................................................................
 
-    // Motor control
-    LeftFrontMotor.spin(directionType::fwd, (Controller1.Axis3.value() + Controller1.Axis4.value())/2, velocityUnits::pct);
-    LeftBackMotor.spin(directionType::fwd, (Controller1.Axis3.value() + Controller1.Axis4.value())/2, velocityUnits::pct);
-    RightFrontMotor.spin(directionType::fwd, (Controller1.Axis1.value() + Controller1.Axis2.value())/2, velocityUnits::pct);
-    RightBackMotor.spin(directionType::fwd, (Controller1.Axis1.value() + Controller1.Axis2.value())/2, velocityUnits::pct);
+    /*
+      _____  _____  _______      ________ 
+     |  __ \|  __ \|_   _\ \    / /  ____|
+     | |  | | |__) | | |  \ \  / /| |__   
+     | |  | |  _  /  | |   \ \/ / |  __|  
+     | |__| | | \ \ _| |_   \  /  | |____ 
+     |_____/|_|  \_\_____|   \/   |______|
+     -------------------------------------
+    */
+    if (Controller1.Axis1.value() == 0) 
+    {
+      leftDrive = Controller1.Axis3.value();
+      rightDrive = Controller1.Axis3.value();
+    }
+    else
+    { 
+      leftDrive = (Controller1.Axis3.value() + Controller1.Axis1.value())/2;
+      rightDrive = (Controller1.Axis3.value() - Controller1.Axis1.value())/2;
+    }
 
-    vex::task::sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
+    LeftDriveMotor.spin(directionType::fwd, leftDrive, velocityUnits::pct); //(Axis3+Axis4)/2;
+    RightDriveMotor.spin(directionType::fwd, rightDrive, velocityUnits::pct);//(Axis3-Axis4)/2;
+    CenterDriveMotor.spin(directionType::fwd, (leftDrive + rightDrive)/2, velocityUnits::pct); //((Axis3+Axis4)/2) / ((Axis3-Axis4)/2)
+
+    /*
+      _____  _____  _  _   ____  
+      |  __ \|  __ \| || | |  _ \ 
+      | |  | | |__) | || |_| |_) |
+      | |  | |  _  /|__   _|  _ < 
+      | |__| | | \ \   | | | |_) |
+      |_____/|_|  \_\  |_| |____/ 
+      ---------------------------
+    */
+    if (Controller1.ButtonR1.pressing())
+    {
+      speedDR4B = 30;
+    }
+    else if (Controller1.ButtonR2.pressing())
+    {
+      speedDR4B = -30;
+    }
+    
+    LeftDR4BMotor.spin(directionType::fwd,  speedDR4B, velocityUnits::pct);
+    RightDR4BMotor.spin(directionType::fwd, speedDR4B, velocityUnits::pct);
+
+    /*
+      _____ _   _ _______       _  ________ 
+     |_   _| \ | |__   __|/\   | |/ /  ____|
+       | | |  \| |  | |  /  \  | ' /| |__   
+       | | | . ` |  | | / /\ \ |  < |  __|  
+      _| |_| |\  |  | |/ ____ \| . \| |____ 
+     |_____|_| \_|  |_/_/    \_\_|\_\______|
+     ---------------------------------------
+    */
+    if (Controller1.ButtonLeft.pressing())
+    {
+      speedIntake -= 2;
+    }
+    else if (Controller1.ButtonRight.pressing())
+    {
+      speedIntake += 2;
+    }
+    if (Controller1.ButtonL1.pressing())
+    {
+      LeftIntakeMotor.spin (directionType::fwd, speedIntake, velocityUnits::pct);
+      RightIntakeMotor.spin(directionType::fwd, speedIntake, velocityUnits::pct);
+    }
+    else if (Controller1.ButtonL2.pressing())
+    {
+      LeftIntakeMotor.spin (directionType::fwd, -speedIntake, velocityUnits::pct);
+      RightIntakeMotor.spin(directionType::fwd, -speedIntake, velocityUnits::pct);
+    }
+
+    /*
+       _____ _    _ ____  ______   _______ _____        __     __
+      / ____| |  | |  _ \|  ____| |__   __|  __ \     /\\ \   / /
+     | |    | |  | | |_) | |__       | |  | |__) |   /  \\ \_/ / 
+     | |    | |  | |  _ <|  __|      | |  |  _  /   / /\ \\   /  
+     | |____| |__| | |_) | |____     | |  | | \ \  / ____ \| |   
+      \_____|\____/|____/|______|    |_|  |_|  \_\/_/    \_\_|   
+     ------------------------------------------------------------
+    */
+    if (Controller1.ButtonUp.pressing())
+    {
+      CubeTrayMotor.spin(directionType::fwd, 20, velocityUnits::pct);
+    }
+    else if (Controller1.ButtonDown.pressing())
+    {
+      CubeTrayMotor.spin(directionType::fwd, -20, velocityUnits::pct);
+    }
+
+    speedDR4B = 0;
+    leftDrive = 0;
+    rightDrive = 0;
+
+
+
+    // Sleep the task for a short amount of time to
+    // prevent wasted resources.
+    vex::task::sleep(20);
   }
 }
 
@@ -100,16 +197,15 @@ void usercontrol( void ) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
-    //Set up callbacks for autonomous and driver control periods.
-    Competition.autonomous( autonomous );
-    Competition.drivercontrol( usercontrol );
-    
-    //Run the pre-autonomous function. 
-    pre_auton();
-       
-    //Prevent main from exiting with an infinite loop.                        
-    while(1) {
-      vex::task::sleep(100);//Sleep the task for a short amount of time to prevent wasted resources.
-    }    
-       
+  // Set up callbacks for autonomous and driver control periods.
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
+
+  // Run the pre-autonomous function.
+  pre_auton();
+
+  // Prevent main from exiting with an infinite loop.
+  while (true) {
+    wait(100, msec);
+  }
 }
