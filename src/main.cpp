@@ -80,6 +80,8 @@ void usercontrol(void) {
   int rightDrive;
   int speedDR4B = 0;
   int speedIntake = 20;
+  int cubetray = 0;
+  int intakeActual = 0;
   while (1) {
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
@@ -106,8 +108,8 @@ void usercontrol(void) {
     }
     else
     { 
-      leftDrive = (Controller1.Axis3.value() + Controller1.Axis1.value())/2;
-      rightDrive = (Controller1.Axis3.value() - Controller1.Axis1.value())/2;
+      leftDrive = 2*(Controller1.Axis3.value() + Controller1.Axis1.value())/2;
+      rightDrive = 2*(Controller1.Axis3.value() - Controller1.Axis1.value())/2;
     }
 
     LeftDriveMotor.spin(directionType::fwd, leftDrive, velocityUnits::pct); //(Axis3+Axis4)/2;
@@ -125,11 +127,11 @@ void usercontrol(void) {
     */
     if (Controller1.ButtonR1.pressing())
     {
-      speedDR4B = 30;
+      speedDR4B = 50;
     }
     else if (Controller1.ButtonR2.pressing())
     {
-      speedDR4B = -30;
+      speedDR4B = -50;
     }
     
     LeftDR4BMotor.spin(directionType::fwd,  speedDR4B, velocityUnits::pct);
@@ -154,14 +156,14 @@ void usercontrol(void) {
     }
     if (Controller1.ButtonL1.pressing())
     {
-      LeftIntakeMotor.spin (directionType::fwd, speedIntake, velocityUnits::pct);
-      RightIntakeMotor.spin(directionType::fwd, speedIntake, velocityUnits::pct);
+      intakeActual = speedIntake;
     }
     else if (Controller1.ButtonL2.pressing())
     {
-      LeftIntakeMotor.spin (directionType::fwd, -speedIntake, velocityUnits::pct);
-      RightIntakeMotor.spin(directionType::fwd, -speedIntake, velocityUnits::pct);
+      intakeActual = -speedIntake;
     }
+    LeftIntakeMotor.spin (directionType::fwd, intakeActual, velocityUnits::pct);
+    RightIntakeMotor.spin(directionType::fwd, intakeActual, velocityUnits::pct);
 
     /*
        _____ _    _ ____  ______   _______ _____        __     __
@@ -174,12 +176,13 @@ void usercontrol(void) {
     */
     if (Controller1.ButtonUp.pressing())
     {
-      CubeTrayMotor.spin(directionType::fwd, 20, velocityUnits::pct);
+      cubetray = -40;
     }
     else if (Controller1.ButtonDown.pressing())
     {
-      CubeTrayMotor.spin(directionType::fwd, -20, velocityUnits::pct);
+      cubetray = 40;
     }
+      CubeTrayMotor.spin(directionType::fwd, cubetray, velocityUnits::pct);
 
     /*
                _    _  _______  ____    _____ 
@@ -190,27 +193,18 @@ void usercontrol(void) {
      /_/    \_\\____/    |_|   \____/ |_____/
      -----------------------------------------
     */
+    // 4 inch wheel
+    // 1.5 inch roller
     if (Controller1.ButtonA.pressing())
     {
-      
-    }
-    else if (Controller1.ButtonB.pressing())
-    {
 
     }
 
-    Controller1.Screen.clearScreen();
-    Controller1.Screen.print("Intake Speed: ");
-    Controller1.Screen.print(speedIntake);
-    Controller1.Screen.newLine();
-    Controller1.Screen.print("DR4B Position: L-");
-    Controller1.Screen.print(LeftDR4BMotor.position(degrees));
-    Controller1.Screen.print(" R-");
-    Controller1.Screen.print(RightDR4BMotor.position(degrees));
     speedDR4B = 0;
     leftDrive = 0;
     rightDrive = 0;
-
+    cubetray = 0;
+    intakeActual = 0;
     // Sleep the task for a short amount of time to
     // prevent wasted resources.
     vex::task::sleep(20);
