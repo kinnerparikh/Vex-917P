@@ -74,8 +74,25 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+// Auton Stuff
+int timeOld = 0;
+int timeNew = 0;
+int deltaTime = 0;
+int leftFrontSpeed = 0;
+int rightFrontSpeed = 0;
+int leftBackSpeed = 0;
+int rightBackSpeed = 0;
+int armSpeed = 0;
+int leftIntakeSpeed = 0;
+int rightIntakeSpeed = 0;
+int angleAdjusterSpeed = 0;
+
 void usercontrol(void) 
 {
+  FILE* usd_file_write = fopen("/USD/rerun.txt", "w");
+  fprintf(usd_file_write, "");
+  fclose(usd_file_write);
+
   // User control code here, inside the loop
   int rightDrive;
   int leftDrive;
@@ -131,6 +148,7 @@ void usercontrol(void)
     */
     if (Controller1.ButtonR1.pressing())      armSpeed = 30;  // Set speed to 30 if pressing R1
     else if (Controller1.ButtonR2.pressing()) armSpeed = -30; // Set speed to -30 if pressing R2
+    else Arm.stop(hold);
     Arm.spin(forward, armSpeed, percent);
 
     /*
@@ -149,9 +167,47 @@ void usercontrol(void)
 
     armSpeed = 0;
     angleAdjusterSpeed = 0;
-    
+
+    if (Controller1.ButtonA.pressing())
+    {
+      RightBack.spinFor(-360, degrees, false);
+      LeftBack.spinFor(-360, degrees, false);
+      RightFront.spinFor(-360, degrees, false);
+      LeftFront.spinFor(-360, degrees, false);
+      RightIntake.spinFor(-360, degrees, false);
+      LeftIntake.spinFor(-360, degrees, true);
+    }
+
+
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
+
+    rightBackSpeed = RightBack.velocity(percent);
+    leftBackSpeed = LeftBack.velocity(percent);
+    rightFrontSpeed = RightFront.velocity(percent);
+    leftFrontSpeed = LeftFront.velocity(percent);
+    angleAdjusterSpeed = AngleAdjuster.velocity(percent);
+    armSpeed = Arm.velocity(percent);
+    leftIntakeSpeed = LeftIntake.velocity(percent);
+    rightIntakeSpeed = RightIntake.velocity(percent);
+
+    FILE* usd_file_write = fopen("/USD/rerun.txt", "a");
+    fprintf(usd_file_write, "RightBack.setVelocity(%i, percent); \n", rightBackSpeed);
+    fprintf(usd_file_write, "LeftBack.setVelocity(%i, percent); \n", leftBackSpeed);
+    fprintf(usd_file_write, "RightFront.setVelocity(%i, percent); \n", rightFrontSpeed);
+    fprintf(usd_file_write, "LeftFront.setVelocity(%i, percent); \n", leftFrontSpeed);
+    fprintf(usd_file_write, "Arm.setVelocity(%i, percent); \n", armSpeed);
+    fprintf(usd_file_write, "AngleAdjuster.setVelocity(%i, percent); \n", angleAdjusterSpeed);
+    fprintf(usd_file_write, "LeftIntake.setVelocity(%i, percent); \n", leftIntakeSpeed);
+    fprintf(usd_file_write, "RightIntake.setVelocity(%i, percent); \n", rightIntakeSpeed);
+    
+    timeNew = Brain.timer(msec);
+    deltaTime = timeNew - timeOld;
+    timeOld = timeNew;
+
+    fprintf(usd_file_write, "wait(%i, msec); \n", deltaTime);
+    fclose(usd_file_write);
+
   }
 }
 
