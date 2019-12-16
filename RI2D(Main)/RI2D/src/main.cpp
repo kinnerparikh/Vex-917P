@@ -11,7 +11,7 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// RightFront           motor         17              
+// RightFront           motor         12              
 // RightBack            motor         20              
 // LeftFront            motor         15              
 // LeftBack             motor         19              
@@ -22,6 +22,7 @@
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
+#include "math.h"
 
 using namespace vex;
 
@@ -58,10 +59,45 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+void driveSpeed(int speed)
+{
+  LeftBack.setVelocity(speed, percent);
+  RightBack.setVelocity(speed, percent);
+  LeftFront.setVelocity(speed, percent);
+  RightFront.setVelocity(speed, percent);
+}
+
+void drive(int deg, bool wait)
+{
+  LeftBack.spinFor(deg, degrees, false);
+  RightBack.spinFor(deg, degrees, false);
+  LeftFront.spinFor(deg, degrees, false);
+  RightFront.spinFor(deg, degrees, true);
+}
+
+void tray(int deg, int speed)
+{
+  AngleAdjuster.setVelocity(speed, percent);
+  AngleAdjuster.spinFor(deg, degrees, true);
+}
+
+
+void intake(int speed)
+{
+  LeftIntake.spin(forward, speed, percent);
+  RightIntake.spin(forward, speed, percent);
+}
+
 void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
+  driveSpeed(70);
+  drive(-360 * 2, true);
+  wait(2, sec);
+  driveSpeed(70);
+  drive(360 * 2, true);
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -75,23 +111,26 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 // Auton Stuff
-int timeOld = 0;
-int timeNew = 0;
-int deltaTime = 0;
-int leftFrontSpeed = 0;
-int rightFrontSpeed = 0;
-int leftBackSpeed = 0;
-int rightBackSpeed = 0;
-int armSpeed = 0;
-int leftIntakeSpeed = 0;
-int rightIntakeSpeed = 0;
-int angleAdjusterSpeed = 0;
+int abs(int num)
+{
+  if (num < 0)
+  {
+    return num * -1;
+  }
+  return num;
+}
+int driveS(int r)
+{
+    /*if(r < 0)
+    {
+      return -1 * pow(r, 1.5);
+    }
+    else return pow(r, 1.5);   */
+    return r;
+}
 
 void usercontrol(void) 
 {
-  FILE* usd_file_write = fopen("/USD/rerun.txt", "w");
-  fprintf(usd_file_write, "");
-  fclose(usd_file_write);
 
   // User control code here, inside the loop
   int rightDrive;
@@ -121,6 +160,8 @@ void usercontrol(void)
     
     rightDrive = Controller1.Axis2.position(percent) - Controller1.Axis1.position(percent); // (Front//Back) - (Left//Right)
     leftDrive = Controller1.Axis2.position(percent) + Controller1.Axis1.position(percent);  // (Front//Back) + (Left//Right)
+    rightDrive = driveS(rightDrive);
+    leftDrive = driveS(leftDrive);
 
     RightBack.spin(forward, rightDrive, percent);
     RightFront.spin(forward, rightDrive, percent);
@@ -146,9 +187,9 @@ void usercontrol(void)
       / ____ \| |  | | | | | |
      /_/    \_\_|  |_| |_| |_|
     */
-    if (Controller1.ButtonR1.pressing())      armSpeed = 30;  // Set speed to 30 if pressing R1
-    else if (Controller1.ButtonR2.pressing()) armSpeed = -30; // Set speed to -30 if pressing R2
-    else Arm.stop(hold);
+    if (Controller1.ButtonR1.pressing())      armSpeed = 50;  // Set speed to 50 if pressing R1
+    else if (Controller1.ButtonR2.pressing()) armSpeed = -50; // Set speed to -50 if pressing R2
+    else if (Arm.position(degrees) >= 135) Arm.stop(hold);
     Arm.spin(forward, armSpeed, percent);
 
     /*
@@ -161,8 +202,8 @@ void usercontrol(void)
                       __/ |                     _/ |                       
                      |___/                     |__/ 
     */
-    if (Controller1.ButtonL1.pressing())      angleAdjusterSpeed = 30;
-    else if (Controller1.ButtonL2.pressing()) angleAdjusterSpeed = -30;
+    if (Controller1.ButtonL1.pressing())      angleAdjusterSpeed = 50;
+    else if (Controller1.ButtonL2.pressing()) angleAdjusterSpeed = -50;
     AngleAdjuster.spin(forward, angleAdjusterSpeed, percent);
 
     armSpeed = 0;
@@ -178,36 +219,8 @@ void usercontrol(void)
       LeftIntake.spinFor(-360, degrees, true);
     }
 
-
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
-
-    rightBackSpeed = RightBack.velocity(percent);
-    leftBackSpeed = LeftBack.velocity(percent);
-    rightFrontSpeed = RightFront.velocity(percent);
-    leftFrontSpeed = LeftFront.velocity(percent);
-    angleAdjusterSpeed = AngleAdjuster.velocity(percent);
-    armSpeed = Arm.velocity(percent);
-    leftIntakeSpeed = LeftIntake.velocity(percent);
-    rightIntakeSpeed = RightIntake.velocity(percent);
-
-    FILE* usd_file_write = fopen("/USD/rerun.txt", "a");
-    fprintf(usd_file_write, "RightBack.setVelocity(%i, percent); \n", rightBackSpeed);
-    fprintf(usd_file_write, "LeftBack.setVelocity(%i, percent); \n", leftBackSpeed);
-    fprintf(usd_file_write, "RightFront.setVelocity(%i, percent); \n", rightFrontSpeed);
-    fprintf(usd_file_write, "LeftFront.setVelocity(%i, percent); \n", leftFrontSpeed);
-    fprintf(usd_file_write, "Arm.setVelocity(%i, percent); \n", armSpeed);
-    fprintf(usd_file_write, "AngleAdjuster.setVelocity(%i, percent); \n", angleAdjusterSpeed);
-    fprintf(usd_file_write, "LeftIntake.setVelocity(%i, percent); \n", leftIntakeSpeed);
-    fprintf(usd_file_write, "RightIntake.setVelocity(%i, percent); \n", rightIntakeSpeed);
-    
-    timeNew = Brain.timer(msec);
-    deltaTime = timeNew - timeOld;
-    timeOld = timeNew;
-
-    fprintf(usd_file_write, "wait(%i, msec); \n", deltaTime);
-    fclose(usd_file_write);
-
   }
 }
 
