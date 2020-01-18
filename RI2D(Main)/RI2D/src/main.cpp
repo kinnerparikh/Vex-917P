@@ -72,7 +72,7 @@ void drive(int deg, bool wait)
   LeftBack.spinFor(deg, degrees, false);
   RightBack.spinFor(deg, degrees, false);
   LeftFront.spinFor(deg, degrees, false);
-  RightFront.spinFor(deg, degrees, true);
+  RightFront.spinFor(deg, degrees, wait);
 }
 
 void tray(int deg, int speed)
@@ -95,7 +95,6 @@ void autonomous(void) {
   driveSpeed(70);
   drive(-360 * 2, true);
   wait(2, sec);
-  driveSpeed(70);
   drive(360 * 2, true);
 
 }
@@ -110,7 +109,6 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-// Auton Stuff
 int abs(int num)
 {
   if (num < 0)
@@ -119,14 +117,10 @@ int abs(int num)
   }
   return num;
 }
-int driveS(int r)
+
+void armMacro()
 {
-    /*if(r < 0)
-    {
-      return -1 * pow(r, 1.5);
-    }
-    else return pow(r, 1.5);   */
-    return r;
+  AngleAdjuster.setPosition(300, degrees);
 }
 
 void usercontrol(void) 
@@ -149,6 +143,7 @@ void usercontrol(void)
     // Insert user code here. This is where you use the joystick values 
     // update your motors, etc.
     // ........................................................................
+    AngleAdjuster.stop(hold);
     /*
       _____       _           
      |  __ \     (_)          
@@ -160,8 +155,6 @@ void usercontrol(void)
     
     rightDrive = Controller1.Axis2.position(percent) - Controller1.Axis1.position(percent); // (Front//Back) - (Left//Right)
     leftDrive = Controller1.Axis2.position(percent) + Controller1.Axis1.position(percent);  // (Front//Back) + (Left//Right)
-    rightDrive = driveS(rightDrive);
-    leftDrive = driveS(leftDrive);
 
     RightBack.spin(forward, rightDrive, percent);
     RightFront.spin(forward, rightDrive, percent);
@@ -187,7 +180,8 @@ void usercontrol(void)
       / ____ \| |  | | | | | |
      /_/    \_\_|  |_| |_| |_|
     */
-    if (Controller1.ButtonR1.pressing())      armSpeed = 50;  // Set speed to 50 if pressing R1
+    
+    if (Controller1.ButtonR1.pressing()){      armSpeed = 50; armMacro();}  // Set speed to 50 if pressing R1
     else if (Controller1.ButtonR2.pressing()) armSpeed = -50; // Set speed to -50 if pressing R2
     else if (Arm.position(degrees) >= 135) Arm.stop(hold);
     Arm.spin(forward, armSpeed, percent);
@@ -205,18 +199,20 @@ void usercontrol(void)
     if (Controller1.ButtonL1.pressing())      angleAdjusterSpeed = 50;
     else if (Controller1.ButtonL2.pressing()) angleAdjusterSpeed = -50;
     AngleAdjuster.spin(forward, angleAdjusterSpeed, percent);
+    Brain.Screen.clearLine();
+    Brain.Screen.print(AngleAdjuster.position(degrees));
 
     armSpeed = 0;
     angleAdjusterSpeed = 0;
 
     if (Controller1.ButtonA.pressing())
     {
-      RightBack.spinFor(-360, degrees, false);
-      LeftBack.spinFor(-360, degrees, false);
-      RightFront.spinFor(-360, degrees, false);
-      LeftFront.spinFor(-360, degrees, false);
+      RightBack.  spinFor(-360, degrees, false);
+      LeftBack.   spinFor(-360, degrees, false);
+      RightFront. spinFor(-360, degrees, false);
+      LeftFront.  spinFor(-360, degrees, false);
       RightIntake.spinFor(-360, degrees, false);
-      LeftIntake.spinFor(-360, degrees, true);
+      LeftIntake. spinFor(-360, degrees, true);
     }
 
     wait(20, msec); // Sleep the task for a short amount of time to
