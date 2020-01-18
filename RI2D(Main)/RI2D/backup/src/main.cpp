@@ -134,8 +134,9 @@ void usercontrol(void)
   int armSpeed = 0;
   int angleAdjusterSpeed = 0; 
 
-  // CHANGE THIS ONE
-  double sensitivity = 1.0;
+
+  // CHANGE THIS
+  double sensitivity = 0.75;
   while (1) 
   {
     // This is the main execution loop for the user control program.
@@ -156,8 +157,8 @@ void usercontrol(void)
      |_____/|_|  |_| \_/ \___|
     */
     
-    rightDrive = Controller1.Axis2.position(percent) - Controller1.Axis1.position(percent); // (Front//Back) - (Left//Right)
-    leftDrive = Controller1.Axis2.position(percent) + Controller1.Axis1.position(percent);  // (Front//Back) + (Left//Right)
+    rightDrive = (int)((Controller1.Axis2.position(percent) - Controller1.Axis1.position(percent)) * sensitivity); // (Front//Back) - (Left//Right)
+    leftDrive = (int)(Controller1.Axis2.position(percent) + Controller1.Axis1.position(percent) * sensitivity);  // (Front//Back) + (Left//Right)
 
     RightBack.spin(forward, rightDrive, percent);
     RightFront.spin(forward, rightDrive, percent);

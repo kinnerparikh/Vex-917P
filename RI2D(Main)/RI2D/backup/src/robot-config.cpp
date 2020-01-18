@@ -19,8 +19,8 @@ motor LeftIntake = motor(PORT16, ratio36_1, false);
 motor AngleAdjuster = motor(PORT18, ratio36_1, true);
 
 // VEXcode generated functions
-// define variable for remote controller enable/disable
-bool RemoteControlCodeEnabled = true;
+
+
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Text.
