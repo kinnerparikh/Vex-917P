@@ -12,6 +12,7 @@ extern motor Arm;
 extern motor RightIntake;
 extern motor LeftIntake;
 extern motor AngleAdjuster;
+extern gyro GyroH;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Text.
