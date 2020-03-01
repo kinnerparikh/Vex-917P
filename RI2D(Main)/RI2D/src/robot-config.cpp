@@ -15,7 +15,7 @@ motor LeftFront = motor(PORT15, ratio18_1, false);
 motor LeftBack = motor(PORT19, ratio18_1, false);
 motor Arm = motor(PORT13, ratio36_1, true);
 motor RightIntake = motor(PORT14, ratio18_1, true);
-motor LeftIntake = motor(PORT16, ratio18_1, false);
+motor LeftIntake = motor(PORT11, ratio18_1, false);
 motor AngleAdjuster = motor(PORT18, ratio36_1, true);
 gyro GyroH = gyro(Brain.ThreeWirePort.H);
 

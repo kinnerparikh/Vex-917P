@@ -17,7 +17,7 @@
 // LeftBack             motor         19              
 // Arm                  motor         13              
 // RightIntake          motor         14              
-// LeftIntake           motor         16              
+// LeftIntake           motor         11              
 // AngleAdjuster        motor         18              
 // GyroH                gyro          H               
 // ---- END VEXCODE CONFIGURED DEVICES ----
@@ -130,6 +130,7 @@ void autonomous(void) {
   wait(1, sec);
   outtake(0);
   armH(-360, 100);*/
+  /*
   drive(250, 50);
   wait(0.5, sec);
   drive(-100, 50);
@@ -157,7 +158,7 @@ void autonomous(void) {
   AngleAdjuster.spinFor(360 * 2, degrees, false);
   wait(3, sec);
   drive(-360, 100);
-  AngleAdjuster.spinFor(-360 * 2, degrees, false);
+  AngleAdjuster.spinFor(-360 * 2, degrees, false);*/
    // ..........................................................................
 
   // drive (int degrees, int speed) degrees spin, speed is in percent
@@ -169,8 +170,44 @@ void autonomous(void) {
   // trayIn (int degrees, int speed) degrees of rotation
   // trayOut (int degrees, int speed) degrees of rotation
   // wait(double number here, sec)
+  AngleAdjuster.setVelocity(100, pct);
   
-  
+  drive(360, 50);
+  wait(1, sec);
+  drive(-200, 50);
+  AngleAdjuster.spinFor(360, degrees);
+  outtake(100);
+  wait(1, sec);
+  outtake(0);
+  AngleAdjuster.spinFor(-360, degrees);
+
+  //
+  intakeH(100);
+  drive(540 + 260 * 2 - 100, 30);
+  wait(3.5, sec);
+  drive(-360 * 2 + 270, 70);
+  wait(1.5, sec);
+
+  //turning
+  driveLeft(270 + 135/2, 50);
+  driveRight(-270 - 135/2, 50);
+  wait(0.75, sec);
+                                                                                                                                                                                                                                                                                                                                                                              
+  //going to zone
+  drive(360 + 15 + 30, 50);
+  wait(1, sec);
+
+  //at zone
+  intakeH(-50);
+  wait(0.5, sec);
+  intakeH(0);
+  AngleAdjuster.setVelocity(35, pct);
+  AngleAdjuster.spinFor(360 + 350, degrees, false);
+  wait(2, sec);
+  drive(60, 40);
+  //outtake(30);
+  wait(1, sec);
+  drive(-360 * 2, 50);
 
 }
 
@@ -193,10 +230,6 @@ int abs(int num)
   return num;
 }
 
-void armMacro()
-{
-  AngleAdjuster.setPosition(300, degrees);
-}
 
 void usercontrol(void) 
 {
@@ -210,7 +243,7 @@ void usercontrol(void)
   int angleAdjusterSpeed = 0; 
 
   // CHANGE THIS ONE
-  double sensitivity = 0.65;
+  double sensitivity = 1;
   while (1) 
   {
     // This is the main execution loop for the user control program.
@@ -230,7 +263,6 @@ void usercontrol(void)
      |_____/|_|  |_| \_/ \___|
     */
     
-    Controller1.ButtonUp.pressed(armMacro); 
     
     rightDrive = (int)(Controller1.Axis2.position(percent) - Controller1.Axis1.position(percent) * (sensitivity)); // (Front//Back) - (Left//Right)
     leftDrive = (int)(Controller1.Axis2.position(percent) + Controller1.Axis1.position(percent) * (sensitivity));  // (Front//Back) + (Left//Right)
@@ -260,8 +292,24 @@ void usercontrol(void)
      /_/    \_\_|  |_| |_| |_|
     */
     
-    if (Controller1.ButtonR1.pressing()){      armSpeed = 50; armMacro();}  // Set speed to 50 if pressing R1
+    if (Controller1.ButtonR1.pressing()){      armSpeed = 50; ;}  // Set speed to 50 if pressing R1
     else if (Controller1.ButtonR2.pressing()) armSpeed = -50; // Set speed to -50 if pressing R2
+
+    if (Controller1.ButtonDown.pressing())
+    {
+      Arm.setVelocity(100, percent);
+      Arm.spinTo(0, deg);
+    }
+    if (Controller1.ButtonLeft.pressing())
+    {
+      Arm.setVelocity(100, percent);
+      Arm.spinTo(360, deg);
+    }
+    if (Controller1.ButtonUp.pressing())
+    {
+      Arm.setVelocity(100, percent);
+      Arm.spinTo(450, deg, false);
+    }
     
     Arm.spin(forward, armSpeed, percent);
 
